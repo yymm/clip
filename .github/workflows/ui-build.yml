@@ -6,10 +6,6 @@ on:
       - 'ui/**'
   workflow_dispatch:
 
-defaults:
-  run:
-    working-directory: ./ui
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -24,7 +20,9 @@ jobs:
           cache: npm
 
       - name: npm install
+        working-directory: ./ui
         run: npm i
 
       - name: npm build
+        working-directory: ./ui
         run: npm run build
