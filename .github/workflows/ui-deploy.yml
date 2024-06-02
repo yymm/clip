@@ -18,6 +18,6 @@ jobs:
       - name: deploy
         uses: cloudflare/wrangler-action@v3
         with:
+          workingDirectory: ui
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          workingDirectory: './ui'
           command: pages deploy
