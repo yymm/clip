@@ -12,6 +12,9 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v4
+      - name: install
+        working-directory: './ui'
+        run: npm install
       - name: build
         working-directory: './ui'
         run: npm run pages:build
