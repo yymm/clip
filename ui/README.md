@@ -1,68 +1,84 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`c3`](https://developers.cloudflare.com/pages/get-started/c3).
+# Welcome to Remix + Cloudflare!
 
-## Getting Started
+- 📖 [Remix docs](https://remix.run/docs)
+- 📖 [Remix Cloudflare docs](https://remix.run/guides/vite#cloudflare)
 
-First, run the development server:
+## Development
 
-```bash
+Run the dev server:
+
+```sh
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+To run Wrangler:
 
-## Cloudflare integration
+```sh
+npm run build
+npm run start
+```
 
-Besides the `dev` script mentioned above `c3` has added a few extra scripts that allow you to integrate the application with the [Cloudflare Pages](https://pages.cloudflare.com/) environment, these are:
-  - `pages:build` to build the application for Pages using the [`@cloudflare/next-on-pages`](https://github.com/cloudflare/next-on-pages) CLI
-  - `preview` to locally preview your Pages application using the [Wrangler](https://developers.cloudflare.com/workers/wrangler/) CLI
-  - `deploy` to deploy your Pages application using the [Wrangler](https://developers.cloudflare.com/workers/wrangler/) CLI
+## Typegen
 
-> __Note:__ while the `dev` script is optimal for local development you should preview your Pages application as well (periodically or before deployments) in order to make sure that it can properly work in the Pages environment (for more details see the [`@cloudflare/next-on-pages` recommended workflow](https://github.com/cloudflare/next-on-pages/blob/05b6256/internal-packages/next-dev/README.md#recommended-workflow))
+Generate types for your Cloudflare bindings in `wrangler.toml`:
 
-### Bindings
+```sh
+npm run typegen
+```
 
-Cloudflare [Bindings](https://developers.cloudflare.com/pages/functions/bindings/) are what allows you to interact with resources available in the Cloudflare Platform.
+You will need to rerun typegen whenever you make changes to `wrangler.toml`.
 
-You can use bindings during development, when previewing locally your application and of course in the deployed application:
+## Deployment
 
-- To use bindings in dev mode you need to define them in the `next.config.js` file under `setupDevBindings`, this mode uses the `next-dev` `@cloudflare/next-on-pages` submodule. For more details see its [documentation](https://github.com/cloudflare/next-on-pages/blob/05b6256/internal-packages/next-dev/README.md).
+> [!WARNING]  
+> Cloudflare does _not_ use `wrangler.toml` to configure deployment bindings.
+> You **MUST** [configure deployment bindings manually in the Cloudflare dashboard][bindings].
 
-- To use bindings in the preview mode you need to add them to the `pages:preview` script accordingly to the `wrangler pages dev` command. For more details see its [documentation](https://developers.cloudflare.com/workers/wrangler/commands/#dev-1) or the [Pages Bindings documentation](https://developers.cloudflare.com/pages/functions/bindings/).
+First, build your app for production:
 
-- To use bindings in the deployed application you will need to configure them in the Cloudflare [dashboard](https://dash.cloudflare.com/). For more details see the  [Pages Bindings documentation](https://developers.cloudflare.com/pages/functions/bindings/).
+```sh
+npm run build
+```
 
-#### KV Example
+Then, deploy your app to Cloudflare Pages:
 
-`c3` has added for you an example showing how you can use a KV binding.
+```sh
+npm run deploy
+```
 
-In order to enable the example:
-- Search for javascript/typescript lines containing the following comment:
-  ```ts
-  // KV Example:
-  ```
-  and uncomment the commented lines below it.
-- Do the same in the `wrangler.toml` file, where
-  the comment is:
-  ```
-  # KV Example:
-  ```
-- If you're using TypeScript run the `cf-typegen` script to update the `env.d.ts` file:
-  ```bash
-  npm run cf-typegen
-  # or
-  yarn cf-typegen
-  # or
-  pnpm cf-typegen
-  # or
-  bun cf-typegen
-  ```
+[bindings]: https://developers.cloudflare.com/pages/functions/bindings/
 
-After doing this you can run the `dev` or `preview` script and visit the `/api/hello` route to see the example in action.
+## Styling
 
-Finally, if you also want to see the example work in the deployed application make sure to add a `MY_KV_NAMESPACE` binding to your Pages application in its [dashboard kv bindings settings section](https://dash.cloudflare.com/?to=/:account/pages/view/:pages-project/settings/functions#kv_namespace_bindings_section). After having configured it make sure to re-deploy your application.
+This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience. You can use whatever css framework you prefer. See the [Vite docs on css](https://vitejs.dev/guide/features.html#css) for more information.
+
+# ui architecture
+
+## router
+
+`_app` はアプリケーションの階層を指しています。 現状 `_app` 以外の階層はないので特に意味はないです。
+
+```
+.
+├── README.md
+├── _app                           # レイアウト、共通コンポーネント、共通フック、コモンのようなもの
+│   ├── components                 # 共通コンポーネント
+│   ├── hooks                      # 共通フック
+│   └── route.tsx                  # レイアウト
+├── _app.$userId                   # ユーザーごとのトップページ
+│   ├── components
+│   ├── hooks
+│   └── route.tsx
+├── _app.$userId.item.$itemId      # ユーザーごとのアイテムページ
+│   ├── components
+│   ├── hooks
+│   └── route.tsx
+├── _app.$userId.item.$itemId.edit # ユーザーごとのアイテム編集ページ
+│   ├── components
+│   ├── hooks
+│   └── route.tsx
+└── _app._index                    # 共通のトップページ、ログインさせる？
+    ├── components
+    ├── hooks
+    └── route.tsx
+```
